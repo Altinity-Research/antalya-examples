@@ -46,7 +46,7 @@ python iceberg_setup.py
 
 Connect to the Antalya server container and start clickhouse-client.
 ```
-docker exec -it $(docker ps -f name=antalya -q) clickhouse-connect
+docker exec -it antalya clickhouse-client
 ```
 
 Confirm you are connected to Antalya. 
@@ -107,9 +107,9 @@ if you have other Docker applications running.
 
 Connect to Antalya, Spark, and Iceberg REST containers. 
 ```
-docker exec -it $(docker ps -f name=antalya -q) /bin/bash
-docker exec -it $(docker ps -f name=spark-iceberg -q) /bin/bash
-docker exec -it $(docker ps -f name=rest -q) /bin/bash
+docker exec -it antalya /bin/bash
+docker exec -it spark-iceberg /bin/bash
+docker exec -it iceberg-rest /bin/bash
 ```
 
 ### Python commands to create and read Iceberg data
@@ -278,7 +278,7 @@ the next build.)
 
 Connect to the spark-iceberg container command line. 
 ```
-docker exec -it $(docker ps -f name=spark-iceberg -q) /bin/bash
+docker exec -it spark-iceberg /bin/bash
 ```
 
 Start the Spark scala shell. Do not be alarmed by its slowness. 

@@ -55,6 +55,7 @@ docker run altinity/clickhouse-keeper:24.12.2.20101.altinityantalya
 Look in the docs directory for current documentation. 
 
 * [Antalya Concepts Guide](docs/concepts.md) 
+* [Antalya Feature Status](docs/feature-status.md) 
 * [Command and Configuration Reference](docs/reference.md)
 
 ## Code
