@@ -1,4 +1,4 @@
-# Iceberg Data Lake Examples
+# Antalya Docker Example
 
 This directory contains samples for construction of an Iceberg-based data 
 lake using Docker Compose and Altinity Antalya. 
@@ -6,29 +6,14 @@ lake using Docker Compose and Altinity Antalya.
 The docker compose structure and the Python scripts take inspiration from 
 [ClickHouse integration tests for Iceberg](https://github.com/ClickHouse/ClickHouse/tree/master/tests/integration/test_database_iceberg) but deviate substantially. 
 
-## Setup
+## Quickstart
 
-### Docker
+Examples are for Ubuntu. Adjust commands for other distros.
 
-Install Docker Desktop and Docker Compose. 
+### Install Docker
 
-### Python
-
-Install Python virtual environment module for your python version. Example shown
-below. 
-```
-sudo apt install python3.12-venv
-```
-
-Create and invoke the venv. Install required modules. 
-```
-python3.12 -m venv venv
-. ./venv/bin/activate
-pip install --upgrade pip
-pip install pyarrow pyiceberg pandas
-```
-
-## Managing Iceberg Installation
+Install [Docker Desktop](https://docs.docker.com/engine/install/) and 
+[Docker Compose](https://docs.docker.com/compose/install/). 
 
 ### Bring up the data lake
 
@@ -36,7 +21,73 @@ pip install pyarrow pyiceberg pandas
 ./x-up.sh
 ```
 
-### Bring down the data lake.
+### Enable Python and create data
+
+Install Python virtual environment module for your python version. Example shown
+below. 
+```
+sudo apt install python3.12-venv
+```
+
+Create and invoke the venv, then install required modules. 
+```
+python3.12 -m venv venv
+. ./venv/bin/activate
+pip install --upgrade pip
+pip install pyarrow pyiceberg pandas
+```
+
+Add data. 
+```
+python iceberg_setup.py
+```
+
+### Demonstrate Antalya queries against a swarm cluster
+
+Connect to the Antalya server container and start clickhouse-client.
+```
+docker exec -it antalya clickhouse-client
+```
+
+Confirm you are connected to Antalya. 
+```
+SELECT version()
+
+   ┌─version()─────────────────────┐
+1. │ 24.12.2.20101.altinityantalya │
+   └───────────────────────────────┘
+```
+
+Select directly from S3 data using the swarm cluster. 
+```
+SELECT hostName() AS host, count()
+FROM s3('http://minio:9000/warehouse/data/data/**/**.parquet')
+GROUP BY host
+SETTINGS use_hive_partitioning=1, object_storage_cluster='swarm'
+```
+
+Select Iceberg table data. 
+```
+SELECT hostName() AS host, count()
+FROM icebergS3Cluster('swarm', 'http://minio:9000/warehouse/data')
+GROUP BY host
+SETTINGS object_storage_cluster = 'swarm'
+```
+
+You will be able to see swarm host names in the results for both queries.
+
+## Reference
+
+This section shows operations in complete detail. 
+
+### Scripts
+
+#### Bring up the data lake.
+```
+./x-up.sh
+```
+
+#### Bring down the data lake.
 
 Minio loses its data when you do this. It's best to remove all containers
 to ensure the data is consistent. 
@@ -44,27 +95,24 @@ to ensure the data is consistent.
 ./x-down.sh
 ```
 
-### Cleaning up
+#### Cleaning up
 
-This deletes *all* containers and volumes for a fresh start. 
+This deletes *all* containers and volumes for a fresh start. Do not use it
+if you have other Docker applications running. 
 ```
-./x-clean.sh
+./x-clean.sh -f
 ```
 
-### Handy commands
+#### Handy Docker commands
 
 Connect to Antalya, Spark, and Iceberg REST containers. 
 ```
-docker exec -it $(docker ps -f name=antalya -q) /bin/bash
-docker exec -it $(docker ps -f name=spark-iceberg -q) /bin/bash
-docker exec -it $(docker ps -f name=rest -q) /bin/bash
+docker exec -it antalya /bin/bash
+docker exec -it spark-iceberg /bin/bash
+docker exec -it iceberg-rest /bin/bash
 ```
 
-## Having fun with Iceberg data. 
-
-First, start docker compose using x-up.sh. 
-
-### Using Python
+### Python commands to create and read Iceberg data
 
 Use Python scripts to create and prove you can read data stored in Iceberg. 
 They use pyiceberg. 
@@ -79,9 +127,7 @@ directory of your virtual environment. There is a bug in some
 environments that prevents pyiceberg libraries from loading properly. 
 Copy the scripts into the directory and run them there. 
 
-### Using new Antalya features
-
-### Using Antalya Features for Iceberg
+### Using Antalya to query Iceberg data
 
 Connect to ClickHouse and use the following commands to run queries. 
 You can access data in 3 different ways. 
@@ -221,6 +267,7 @@ ENGINE = Merge(REGEXP('local|datalake'), '.*bids')
 ;
 SELECT * FROM all_bids
 ;
+```
 
 #### Query on Iceberg database using Antalya swarm cluster
 
@@ -231,7 +278,7 @@ the next build.)
 
 Connect to the spark-iceberg container command line. 
 ```
-docker exec -it $(docker ps -f name=spark-iceberg -q) /bin/bash
+docker exec -it spark-iceberg /bin/bash
 ```
 
 Start the Spark scala shell. Do not be alarmed by its slowness. 
@@ -255,7 +302,7 @@ spark.sql("SELECT * FROM iceberg.bids").show()
 Try selecting data each of the three ways in ClickHouse to see which of them 
 still give the right answers. 
 
-## Fetching values from Iceberg catalog using curl
+### Fetching values from Iceberg catalog using curl
 
 The Iceberg REST API is simple to query using curl. The documentation is 
 effectively [the full REST spec in the Iceberg GitHub Repo](https://github.com/apache/iceberg/blob/main/open-api/rest-catalog-open-api.yaml). Meanwhile here 

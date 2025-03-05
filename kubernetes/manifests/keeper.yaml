@@ -1,0 +1,33 @@
+apiVersion: "clickhouse-keeper.altinity.com/v1"
+kind: "ClickHouseKeeperInstallation"
+metadata:
+  name: "keeper"
+spec:
+  configuration:
+    clusters:
+      - name: "example"
+        layout:
+          replicasCount: 3
+  defaults:
+    templates:
+      podTemplate: default
+      dataVolumeClaimTemplate: default
+  templates:
+    podTemplates:
+      - name: default
+        spec:
+          containers:
+            - name: clickhouse-keeper
+              imagePullPolicy: IfNotPresent
+              image: "altinity/clickhouse-keeper:24.12.2.20101.altinityantalya"
+    volumeClaimTemplates:
+      - name: default
+        metadata:
+          name: both-paths
+        spec:
+          storageClassName: gp3-encrypted
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 25Gi

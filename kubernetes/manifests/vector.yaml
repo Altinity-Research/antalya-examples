@@ -1,0 +1,60 @@
+apiVersion: "clickhouse.altinity.com/v1"
+kind: "ClickHouseInstallation"
+metadata:
+  name: "vector"
+spec:
+  configuration:
+    clusters:
+      - name: "example"
+        layout:
+          replicas:
+          - templates:
+              podTemplate: replica
+              volumeClaimTemplate: storage
+          shardsCount: 1
+        templates:
+    zookeeper:
+        nodes:
+        - host: keeper-keeper
+          port: 2181
+    files:
+      config.d/remote_servers.xml: |
+        <clickhouse>
+          <allow_experimental_cluster_discovery>1</allow_experimental_cluster_discovery>
+          <remote_servers>
+            <!-- Swarm cluster built using remote discovery. -->
+            <swarm>
+              <discovery>
+                <path>/clickhouse/discovery/swarm</path>
+                <secret>secret_key</secret>
+                <!-- Use but do not join cluster. -->
+                <observer>true</observer>
+              </discovery>
+            </swarm>
+          </remote_servers>
+        </clickhouse>
+  templates:
+    podTemplates:
+      - name: replica
+        spec:
+          nodeSelector:
+            node.kubernetes.io/instance-type: m6i.large
+          containers:
+          - name: clickhouse
+            image: altinity/clickhouse-server:24.12.2.20101.altinityantalya
+          tolerations:
+          - key: "dedicated"
+            operator: "Equal"
+            value: "clickhouse"
+            effect : "NoSchedule"
+    volumeClaimTemplates:
+      - name: storage
+        # Uncomment for prod systems. You will then need to delete PVCs manually.
+        # reclaimPolicy: Retain
+        spec:
+          storageClassName: gp3-encrypted
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
