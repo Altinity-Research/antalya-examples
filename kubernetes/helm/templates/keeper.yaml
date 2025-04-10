@@ -20,6 +20,30 @@ spec:
             - name: clickhouse-keeper
               imagePullPolicy: {{ .Values.keeper.image.pullPolicy }}
               image: "{{ .Values.keeper.image.repository }}:{{ .Values.keeper.image.tag }}"
+              resources:
+                requests:
+                  cpu: "{{ $.Values.keeper.resources.cpuRequestsMs }}"
+                  memory: "{{ $.Values.keeper.resources.memoryRequestsMiB }}"
+                limits:
+                  cpu: "{{ $.Values.keeper.resources.cpuLimitsMs }}"
+                  memory: "{{ $.Values.keeper.resources.memoryLimitsMiB }}"
+          {{- if $.Values.keeper.nodeSelector }}
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      {{- range $k, $v := $.Values.keeper.nodeSelector }}
+                      - key: {{ $k }}
+                        operator: In
+                        values:
+                          - {{ $v }}
+                      {{- end }}
+          {{- end }}
+          {{- with $.Values.keeper.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
     volumeClaimTemplates:
       - name: default
         metadata:
