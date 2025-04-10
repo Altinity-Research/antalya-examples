@@ -11,6 +11,7 @@ spec:
           - templates:
               podTemplate: replica
               volumeClaimTemplate: storage
+          shardsCount: {{ .Values.vector.shardsCount }}
         templates:
     zookeeper:
         nodes:
@@ -35,19 +36,20 @@ spec:
   templates:
     podTemplates:
       - name: replica
+        distribution: "OnePerHost"
         spec:
-{{ if .Values.vector.nodeSelector }}
+{{- if .Values.vector.nodeSelector }}
           nodeSelector:
 {{ toYaml .Values.vector.nodeSelector | indent 12 }}
-{{ end }}
-{{ if .Values.vector.tolerations }}
+{{- end }}
+{{- if .Values.vector.tolerations }}
           tolerations:
 {{ toYaml .Values.vector.tolerations | indent 12 }}
-{{ end }}
-{{ if .Values.vector.affinity }}
+{{- end }}
+{{- if .Values.vector.affinity }}
           affinity:
 {{ toYaml .Values.vector.affinity | indent 12 }}
-{{ end }}
+{{- end }}
           containers:
           - name: clickhouse
             image: {{ .Values.vector.image.repository }}:{{ .Values.vector.image.tag }}

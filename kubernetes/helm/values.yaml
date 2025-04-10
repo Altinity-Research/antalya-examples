@@ -9,10 +9,32 @@ keeper:
   storage:
     class: ""  # Defaults to global.storageClass if empty
     size: "25Gi"
+  nodeSelector:
+    "node.kubernetes.io/instance-type": "m6i.large"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "clickhouse"
+      effect: "NoSchedule"
   image:
     repository: "altinity/clickhouse-keeper"
     tag: "24.12.2.20203.altinityantalya"
     pullPolicy: "IfNotPresent"
+  resources:
+    cpuRequestsMs: 1
+    memoryRequestsMiB: 3Gi
+    cpuLimitsMs: 2
+    memoryLimitsMiB: 3Gi
+  affinity:
+    podAntiffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: "clickhouse.altinity.com/app"
+                operator: In
+                values:
+                  - "chop"
+          topologyKey: "kubernetes.io/hostname"
 
 # ClickHouse Vector settings
 vector:
@@ -31,6 +53,16 @@ vector:
   image:
     repository: "altinity/clickhouse-server"
     tag: "24.12.2.20203.altinityantalya"
+  affinity:
+    podAntiffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: "clickhouse.altinity.com/app"
+                operator: In
+                values:
+                  - "chop"
+          topologyKey: "kubernetes.io/hostname"
 
 # ClickHouse Swarm settings
 swarm:

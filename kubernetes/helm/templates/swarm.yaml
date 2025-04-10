@@ -12,7 +12,7 @@ spec:
           - templates:
               podTemplate: replica
               volumeClaimTemplate: storage
-          shardsCount: {{ .Values.vector.shardsCount }}
+          shardsCount: {{ .Values.swarm.shardsCount }}
         templates:
     zookeeper:
         nodes:
@@ -35,6 +35,9 @@ spec:
   templates:
     podTemplates:
       - name: replica
+        podDistribution:
+          - type: ClickHouseAntiAffinity
+            scope: ClickHouseInstallation
         spec:
 {{ if .Values.swarm.nodeSelector }}
           nodeSelector:
