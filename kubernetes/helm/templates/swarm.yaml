@@ -35,31 +35,31 @@ spec:
     podTemplates:
       - name: replica
         spec:
-{{ if .Values.swarm.replicas.nodeSelector }}
+{{ if .Values.swarm.nodeSelector }}
           nodeSelector:
-{{ toYaml .Values.swarm.replicas.nodeSelector | indent 12 }}
+{{ toYaml .Values.swarm.nodeSelector | indent 12 }}
 {{ end }}
-{{ if .Values.swarm.replicas.tolerations }}
+{{ if .Values.swarm.tolerations }}
           tolerations:
-{{ toYaml .Values.swarm.replicas.tolerations | indent 12 }}
+{{ toYaml .Values.swarm.tolerations | indent 12 }}
 {{ end }}
-{{ if .Values.swarm.replicas.affinity }}
+{{ if .Values.swarm.affinity }}
           affinity:
             # Specify Pod anti-affinity to Pods with the same label "/app" on the same "hostname"
             podAntiAffinity:
-{{ toYaml .Values.swarm.replicas.affinity.podAntiAffinity | indent 14 }}
+{{ toYaml .Values.swarm.affinity.podAntiAffinity | indent 14 }}
 {{ end }}
           containers:
           - name: clickhouse
             image: {{ .Values.swarm.image.repository }}:{{ .Values.swarm.image.tag }}
     volumeClaimTemplates:
       - name: storage
-        # Uncomment for prod systems. You will then need to delete PVCs manually. 
+        # Uncomment for prod systems. You will then need to delete PVCs manually.
         # reclaimPolicy: Retain
         spec:
           {{- $storageClass := "" }}
-          {{- if .Values.swarm.replicas.storage.class }}
-          {{- $storageClass = .Values.swarm.replicas.storage.class }}
+          {{- if .Values.swarm.storage.class }}
+          {{- $storageClass = .Values.swarm.storage.class }}
           {{- else }}
           {{- $storageClass = .Values.global.storageClass }}
           {{- end }}
@@ -70,4 +70,4 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: {{ .Values.swarm.replicas.storage.size }}
+              storage: {{ .Values.swarm.storage.size }}
