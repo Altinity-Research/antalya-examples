@@ -1,3 +1,5 @@
+# THIS REPO HAS MOVED!!! Our new home: https://github.com/Altinity/antalya-examples
+
 # Installing Vector and Swarm clusters using manifest files
 
 This directory shows how to set up an Antalya swarm cluster using 

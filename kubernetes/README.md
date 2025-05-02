@@ -1,3 +1,5 @@
+# THIS REPO HAS MOVED!!! Our new home: https://github.com/Altinity/antalya-examples
+
 # Antalya Kubernetes Example
 
 This directory contains samples for querying a Parquet-based data lake

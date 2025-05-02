@@ -1,3 +1,5 @@
+# THIS REPO HAS MOVED!!! Our new home: https://github.com/Altinity/antalya-examples
+
 # Antalya Docker Example
 
 This directory contains samples for construction of an Iceberg-based data 

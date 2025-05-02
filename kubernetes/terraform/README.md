@@ -1,3 +1,5 @@
+# THIS REPO HAS MOVED!!! Our new home: https://github.com/Altinity/antalya-examples
+
 # Installing AWS EKS using terraform
 
 This directory shows how to use the Altinity 

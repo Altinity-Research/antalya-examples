@@ -2,6 +2,8 @@
   <img src="https://img.shields.io/static/v1?logo=slack&logoColor=959DA5&label=Slack&labelColor=333a41&message=join%20conversation&color=3AC358" alt="AltinityDB Slack" />
 </a>
 
+# THIS REPO HAS MOVED!!! Our new home: https://github.com/Altinity/antalya-examples 
+
 # Altinity Antalya Examples Project
 
 Altinity Antalya is a new branch of ClickHouse code designed to
