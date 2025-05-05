@@ -37,17 +37,17 @@ spec:
     podTemplates:
       - name: replica
         spec:
-{{ if .Values.vector.replicas.nodeSelector }}
+{{ if .Values.vector.nodeSelector }}
           nodeSelector:
-{{ toYaml .Values.vector.replicas.nodeSelector | indent 12 }}
+{{ toYaml .Values.vector.nodeSelector | indent 12 }}
 {{ end }}
-{{ if .Values.vector.replicas.tolerations }}
+{{ if .Values.vector.tolerations }}
           tolerations:
-{{ toYaml .Values.vector.replicas.tolerations | indent 12 }}
+{{ toYaml .Values.vector.tolerations | indent 12 }}
 {{ end }}
-{{ if .Values.vector.replicas.affinity }}
+{{ if .Values.vector.affinity }}
           affinity:
-{{ toYaml .Values.vector.replicas.affinity | indent 12 }}
+{{ toYaml .Values.vector.affinity | indent 12 }}
 {{ end }}
           containers:
           - name: clickhouse
@@ -58,8 +58,8 @@ spec:
         # reclaimPolicy: Retain
         spec:
           {{- $storageClass := "" }}
-          {{- if .Values.vector.replicas.storage.class }}
-          {{- $storageClass = .Values.vector.replicas.storage.class }}
+          {{- if .Values.vector.storage.class }}
+          {{- $storageClass = .Values.vector.storage.class }}
           {{- else }}
           {{- $storageClass = .Values.global.storageClass }}
           {{- end }}
@@ -70,4 +70,4 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: {{ .Values.vector.replicas.storage.size }}
+              storage: {{ .Values.vector.storage.size }}
